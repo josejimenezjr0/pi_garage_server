@@ -25,33 +25,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 require('./routes/authRoutes')(app);
-require('./routes/userRoutes')(app);
 app.get('/', (req, res) => {
-  console.log('/ from main index');
-  let adminContent = `
-    <div>
-      You don't appear to be logged in.  You can log in by visiting
-      <a href="/login">the Authentication Route</a>. You could
-      also look at details about yourself at <a href="/current_user">the Current User route</a>
-    </div>
-  `;
-  if (req.user) {
-    adminContent = `
-      <div>
-        You appear to be logged in, so you can visit <a href="/admins">the Admins route</a>
-        or you can <a href="/logout">Logout</a>.
-      </div>
-    `;
-  }
-  res.send(`
-    <div>
-      <h4>Hi!  Welcome to the React SSR API</h4>
-      <div>
-        You can see <a href="/users">the Users route</a>
-      </div>
-      ${adminContent}
-    </div>
-  `);
+  let auth = req.user ? 
+    `<div>
+      <p>Ok, I trust you now...</p>
+      <a href="/auth_blink">Blink it</a>
+      </br>
+      <a href="/auth_on">Turn it on</a>
+      </br>
+      <a href="/auth_off">Turn it off</a>
+      <p>Or you can leave...</p>
+      <a href="/logout">Logout :(</a>
+    </div>`
+    :
+    `<a href="/login">Make it blink!</a>`
+  
+  res.send(`<div>${auth}</div>`)
 });
 
 const PORT = process.env.PORT;
