@@ -1,6 +1,7 @@
 const passport = require('passport');
 const requireLogin = require('../middlewares/requireLogin')
 const axios = require('axios')
+const { IPROUTE } = process.env;
 
 module.exports = app => {
   app.get(
@@ -8,15 +9,6 @@ module.exports = app => {
     passport.authenticate('auth0', {}),
     (req, res) => {
       console.log('/login')
-    }
-  );
-
-  app.get(
-    '/login/callback',
-    passport.authenticate('auth0'),
-    (req, res) => {
-      console.log('/login/callback')
-      res.redirect('/users');
     }
   );
 
@@ -43,7 +35,7 @@ module.exports = app => {
 
   app.get('/auth_blink', requireLogin, (req, res) => {
     console.log('/auth_blink')
-    axios.get('http://192.168.86.45:5000/blink')
+    axios.get(`${IPROUTE}/blink`)
       .then(res => {
         console.log('Yay, blink?')
       })
@@ -55,7 +47,7 @@ module.exports = app => {
 
   app.get('/auth_on', requireLogin, (req, res) => {
     console.log('/auth_on')
-    axios.get('http://192.168.86.45:5000/led_on')
+    axios.get(`${IPROUTE}/led_on`)
       .then(res => {
         console.log('Yay, on?')
       })
@@ -67,7 +59,7 @@ module.exports = app => {
 
   app.get('/auth_off', requireLogin, (req, res) => {
     console.log('/auth_off')
-    axios.get('http://192.168.86.45:5000/led_off')
+    axios.get(`${IPROUTE}/led_off`)
       .then(res => {
         console.log('Yay, off?')
       })
