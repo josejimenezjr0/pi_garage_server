@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('./models/User');
 require('./services/passport');
-// const requireLogin = require('./middlewares/requireLogin')
 
 mongoose.connect(process.env.MONGOOSE, {useNewUrlParser:true, useUnifiedTopology: true })
 
@@ -23,14 +22,11 @@ app.use(bodyParser.json());
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,
-    // keys: [keys.cookieKey]
     secret: process.env.COOKIE_SECRET
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
-//
-app.use(login)
 
 require('./routes/authRoutes')(app);
 

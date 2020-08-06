@@ -1,32 +1,32 @@
 const passport = require('passport');
-// const requireLogin = require('../middlewares/requireLogin')
 const axios = require('axios')
-const { IPROUTE } = process.env;
+const { IPROUTE, AUTH_JJJ, AUTH_LEJ } = process.env;
 
 const requireLogin = (req, res, next) => {
   if (!req.user) {
-    // return res.status(401).send({ error: '<a href="/login">login</a>' });
-    return res.status(401).send('<a href="/login">LOGIN</a>');
+    return res.status(401).send('<a href="/login">login</a>');
   }
-
   next();
+}
+
+const verify = (req, res, next) => {
+  if(!(req.user.authId == AUTH_JJJ || req.user.authId == AUTH_LEJ)) {
+    return res.status(401).send('<a href="/login">LOGIN</a>');  
+  }
+  next()
 }
 
 module.exports = app => {
   app.get('/', (req, res) => {
-    let auth = req.user ? 
+    let auth = req.user && (req.user.authId === AUTH_JJJ  || req.user.authId === AUTH_LEJ) ? 
       `<div>
-        <p>Ok, I trust you now...</p>
-        <a href="/auth_blink">Blink it</a>
-        </br>
-        <a href="/auth_on">Turn it on</a>
-        </br>
-        <a href="/auth_off">Turn it off</a>
-        <p>Or you can leave...</p>
-        <a href="/logout">Logout :(</a>
+        <a href="/auth_blink">Blink</a></br>
+        <a href="/auth_on">On</a></br>
+        <a href="/auth_off">Off</a></br>
+        <a href="/logout">Logout</a>
       </div>`
       :
-      `<a href="/login">Login</a>`
+      `<a href="/login">Login!</a>`
     
     res.send(`<div>${auth}</div>`)
   })
@@ -49,12 +49,12 @@ module.exports = app => {
     res.redirect('/')
   });
 
-  app.get('/current_user', requireLogin, (req, res) => {
+  app.get('/current_user', requireLogin, verify, (req, res) => {
     console.log('/current_user')
     res.send(req.user);
   });
 
-  app.get('/auth_blink', requireLogin, (req, res) => {
+  app.get('/auth_blink', requireLogin, verify, (req, res) => {
     console.log('/auth_blink')
     axios.get(`${IPROUTE}/blink`)
       .then(res => {
@@ -66,7 +66,7 @@ module.exports = app => {
     res.redirect('/')
   });
 
-  app.get('/auth_on', requireLogin, (req, res) => {
+  app.get('/auth_on', requireLogin, verify, (req, res) => {
     console.log('/auth_on')
     axios.get(`${IPROUTE}/led_on`)
       .then(res => {
@@ -78,7 +78,7 @@ module.exports = app => {
     res.redirect('/')
   });
 
-  app.get('/auth_off', requireLogin, (req, res) => {
+  app.get('/auth_off', requireLogin, verify, (req, res) => {
     console.log('/auth_off')
     axios.get(`${IPROUTE}/led_off`)
       .then(res => {
