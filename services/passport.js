@@ -26,14 +26,13 @@ passport.use(
     passReqToCallback: true
   },
   async (req, accessToken, refreshToken, extraparams, profile, done) => {
-    console.log("in callbackURL: '/api/login/callback',");
-    const existingUser = await User.findOne({ googleId: profile.id });
+    const existingUser = await User.findOne({ authId: profile.id });
 
     if (existingUser) {
       return done(null, existingUser);
     }
 
-    const user = await new User({ googleId: profile.id }).save();
+    const user = await new User({ authId: profile.id, profileRAW: profile._raw }).save();
     done(null, user);
     }
   )

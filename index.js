@@ -7,10 +7,16 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('./models/User');
 require('./services/passport');
+// const requireLogin = require('./middlewares/requireLogin')
 
 mongoose.connect(process.env.MONGOOSE, {useNewUrlParser:true, useUnifiedTopology: true })
 
-const app = express();
+const app = express()
+
+const login = (req, res, next) => {
+  !req.user && passport.authenticate('auth0', {})
+  next();
+}
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -23,25 +29,11 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+//
+app.use(login)
 
 require('./routes/authRoutes')(app);
-app.get('/', (req, res) => {
-  let auth = req.user ? 
-    `<div>
-      <p>Ok, I trust you now...</p>
-      <a href="/auth_blink">Blink it</a>
-      </br>
-      <a href="/auth_on">Turn it on</a>
-      </br>
-      <a href="/auth_off">Turn it off</a>
-      <p>Or you can leave...</p>
-      <a href="/logout">Logout :(</a>
-    </div>`
-    :
-    `<a href="/login">Make it blink!</a>`
-  
-  res.send(`<div>${auth}</div>`)
-});
+
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
