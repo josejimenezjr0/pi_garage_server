@@ -3,22 +3,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 require('./models/User');
-require('./services/passport');
+require('./passport');
 
 mongoose.connect(process.env.MONGOOSE, {useNewUrlParser:true, useUnifiedTopology: true })
 
 const app = express()
 
-const login = (req, res, next) => {
-  !req.user && passport.authenticate('auth0', {})
-  next();
-}
-
 app.use(cors());
-app.use(bodyParser.json());
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -28,8 +21,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-require('./routes/authRoutes')(app);
-
+require('./routes/routes')(app);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
